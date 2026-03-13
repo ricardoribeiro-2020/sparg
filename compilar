@@ -1,2 +1,2 @@
-ifc -O3 -o sparg -Vaxlib  arranque.f90
+gfortran -O3 -o sparg arranque.f90
 
