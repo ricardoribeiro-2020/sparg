@@ -9,6 +9,30 @@
 
 ---
 
+## Simulation pipeline
+
+sparg is the first step in a three-program pipeline for simulating charge
+transport in conducting polymers:
+
+```
+sparg  →  prepara  →  conducao
+```
+
+1. **sparg** (this program) generates the polymer morphology and writes
+   `cadeias.txt` and `monomeros.txt`.
+
+2. **prepara** reads those files and converts the geometry into the form
+   needed by conducao: chain start/middle/end coordinates, direction cosines,
+   and the inter-chain connectivity table (`vectorcad.txt`, `tabcad.txt`).
+
+3. **conducao** runs the Monte Carlo charge-transport simulation on the
+   prepared geometry.
+
+The box dimensions (`DIMENSOES`) and monomer length (`COMPRIMENTO`) set in
+`sparg.ini` must match the corresponding entries in `conducao.ini`.
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
@@ -27,7 +51,7 @@
 
 SPARG places polymer chains inside a rectangular simulation box, divided into one or more **domains** with distinct physical properties (orientation, density, chain-length distribution). Each chain is built by growing monomers stepwise from a random seed position and orientation. The program avoids overlaps through collision detection, enforces periodic boundary conditions in x and y, and outputs per-sample monomer coordinates together with aggregate statistics across multiple samples.
 
-Typical use case: generating input configurations for neutron/X-ray scattering analysis or mesoscopic molecular dynamics simulations.
+Typical use case: generating polymer morphologies for charge-transport simulations (via **prepara** + **conducao**), neutron/X-ray scattering analysis, or mesoscopic molecular dynamics simulations.
 
 ---
 
@@ -290,8 +314,8 @@ END
 
 | File | Contents |
 |------|----------|
-| `cadeias.txt` | One line per chain: domain index, starting monomer index, and all monomer indices in the chain |
-| `monomeros.txt` | One line per monomer: `id  x  y  z  alfa  beta  gama` (coordinates in nm, angles in radians) |
+| `cadeias.txt` | Header: total chain count. Then one line per chain with 20 monomer indices (first is the start monomer, unused slots are 0). Then one line per chain with its length. Read by **prepara**. |
+| `monomeros.txt` | Header: total monomer count. Then one line per monomer: `id  x  y  z  alfa  beta  gama` (coordinates in nm, angles in radians). Read by **prepara** and `spagheti`. |
 
 ### Summary log
 
