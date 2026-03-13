@@ -2,8 +2,7 @@ MODULE input
 
   USE comum
 
-  USE DFPORT    ! E' necessario comentar esta linha quando nao se usa o fortran
-                ! da DIGITAL/COMPAQ/HP
+
 
   CONTAINS
 
@@ -57,6 +56,7 @@ MODULE input
     INTEGER(KIND=4) :: i, j, k, temp
     INTEGER(KIND=4) :: semente
     REAL(KIND=4) :: a
+    LOGICAL :: existe
 
     CHARACTER(25) :: WDKEY
     CHARACTER(25) :: WKEY
@@ -65,6 +65,12 @@ MODULE input
 
     numeromon = 300000
     numerocad = 50000
+
+    INQUIRE(FILE="sparg.ini", EXIST=existe)
+    IF (.NOT. existe) THEN
+      WRITE(*,*) 'Erro: ficheiro de input "sparg.ini" nao encontrado.'
+      STOP
+    ENDIF
 
     OPEN (UNIT=1, FILE="sparg.ini", STATUS="old")
     OPEN (UNIT=2, FILE="sparg.txt")
@@ -202,7 +208,7 @@ MODULE input
     ALLOCATE (cadeia(1:numerocad,0:20), ncadeia(1:numerocad), ncadeiafim(1:numerocad), STAT=error)
 
     IF (error /= 0) THEN
-      WRITE(*,*) 'Erro ao alocar espaço para os arrays cadeia, ncadeia e ncadeiafim.'
+      WRITE(*,*) 'Erro ao alocar espaï¿½o para os arrays cadeia, ncadeia e ncadeiafim.'
       WRITE(*,*) 'numerocad = ',numerocad
       STOP
     ENDIF
@@ -224,7 +230,7 @@ MODULE input
               array(1:numeromon*10,1:3), STAT=error)
 
     IF (error /= 0) THEN
-      WRITE(*,*) 'Erro ao alocar espaço para os arrays pos, alfa, beta, gama, array.'
+      WRITE(*,*) 'Erro ao alocar espaï¿½o para os arrays pos, alfa, beta, gama, array.'
       WRITE(*,*) 'numeromon = ',numeromon
       STOP
     ENDIF
@@ -257,7 +263,7 @@ MODULE input
     WRITE(UNIT=2,FMT=*)
 
 ! utilizacao do seed
-    a = RAND(semente)
+    CALL srand(semente)
 
 
 ! array auxiliar para estabelecer as condicoes fronteira
@@ -274,9 +280,11 @@ MODULE input
     fronteira(7,2) = 0.
     fronteira(8,2) = -dimy
 
-!alocar espaço para as variaveis estatisticas
+!alocar espaï¿½o para as variaveis estatisticas
 
-    ALLOCATE (con_tam_cad(0:20,1:ndom,1:vezes))
+    tam_max_cad = INT(MAXVAL(medias(1:ndom)) + 4.*MAXVAL(desvios(1:ndom))) + 1
+
+    ALLOCATE (con_tam_cad(0:tam_max_cad,1:ndom,1:vezes))
     ALLOCATE (con_ang_cad(0:18,1:ndom,1:vezes))
     ALLOCATE (con_pos_cad(0:dimz_inteiro,1:ndom,1:vezes))
     ALLOCATE (con_pos_mon(0:dimz_inteiro,1:vezes))
@@ -289,14 +297,14 @@ MODULE input
 ! array de directorias
     ALLOCATE (director(1:vezes))
 
-    IF (vezes <= 1) THEN
+    IF (vezes == 1) THEN
       director(1) = './'
-    ELSEIF (vezes <= 10 .AND. vezes > 1) THEN
+    ELSE
       DO i=1, vezes
-        director(i) = './' // ACHAR(i+47) // '/'
+        WRITE(director(i), '(A,I0,A)') './', i, '/'
+        CALL EXECUTE_COMMAND_LINE('mkdir -p ' // TRIM(director(i)))
       ENDDO
     ENDIF
-    director = ADJUSTR(director)
 
     RETURN
   END SUBROUTINE

@@ -38,11 +38,11 @@ MODULE prints
 
 ! variaveis mudas
     INTEGER(KIND=4) :: i, j
-    INTEGER(KIND=4),DIMENSION(1:20) :: a
-    CHARACTER(LEN=25) :: direcadeias, diremonomeros
+    INTEGER(KIND=4),DIMENSION(1:tam_max_cad) :: a
+    CHARACTER(LEN=40) :: direcadeias, diremonomeros
 
-    direcadeias = director(contavezes)//'cadeias.txt'
-    diremonomeros = director(contavezes)//'monomeros.txt'
+    direcadeias = TRIM(director(contavezes))//'cadeias.txt'
+    diremonomeros = TRIM(director(contavezes))//'monomeros.txt'
 
 !!! Escrita do ficheiro das cadeias
     OPEN (UNIT=4, FILE=direcadeias)
@@ -54,7 +54,7 @@ MODULE prints
       DO j=2,ncadeia(i)
         a(j) = a(j-1) + 1
       ENDDO
-      WRITE(UNIT=4,FMT='(20I7)') a(:)
+      WRITE(UNIT=4,FMT=*) a(:)
     ENDDO
 
     DO i=1,Ncad
@@ -112,7 +112,7 @@ MODULE prints
     WRITE(UNIT=2,FMT=*)'amostra, dominio, tamanho cadeia, numero de cadeias'
     DO k=1, vezes
       DO i=1,ndom
-        DO j=2,20
+        DO j=2,tam_max_cad
           WRITE(UNIT=2,FMT='(4i8)') k,i,j,con_tam_cad(j,i,k)
         ENDDO
       ENDDO

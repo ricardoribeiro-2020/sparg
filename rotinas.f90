@@ -1,7 +1,6 @@
 MODULE rotinas
 
-  USE DFPORT    !Sera necessario comentar esta linha quando nao se estiver a usar 
-                ! o fortran da DIGITAL/COMPAQ/HP
+
   USE comum
 
 !  IMPLICIT NONE

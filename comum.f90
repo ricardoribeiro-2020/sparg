@@ -33,7 +33,7 @@
 ! tamarray - tamanho do array com os pontos existentes
 ! fronteira - array auxiliar para o calculo das condicoes fronteira
 
-! cadeia(Ncad, 0:1) - array com a listagem das cadeias e do 1º monomero
+! cadeia(Ncad, 0:1) - array com a listagem das cadeias e do 1ï¿½ monomero
 !                          na posicao 0 indica o dominio a que pertence a cadeia
 ! ncadeia(Ncad) - numero de monomeros em cada cadeia
 ! ncadeiafim(Ncad) - numero de monomeros final previsto para cada cadeia
@@ -154,10 +154,12 @@
     INTEGER(KIND=4) :: vezes, tenta_encaix, contavezes
     CHARACTER(LEN=10),ALLOCATABLE, DIMENSION(:) :: director
 
+    INTEGER(KIND=4) :: tam_max_cad
+
     INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:,:) :: con_tam_cad
     INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:,:) :: con_ang_cad
     INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:,:) :: con_pos_cad
-    INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:) :: con_pos_mon   
+    INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:) :: con_pos_mon
 
 
   CONTAINS
@@ -224,6 +226,7 @@
 
     vezes = 1
     contavezes = 1
+    tam_max_cad = 20
 
   END SUBROUTINE
 

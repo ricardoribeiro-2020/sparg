@@ -1,7 +1,6 @@
 MODULE gaussiana
 
-  USE DFPORT    !Sera necessario comentar esta linha quando nao se estiver a usar 
-                ! o fortran da DIGITAL/COMPAQ/HP
+
 !  IMPLICIT NONE
 
   CONTAINS
@@ -40,7 +39,7 @@ MODULE gaussiana
 ! valor1, valor2 - valor maximo e minimo da distribuicao
 !                  integer*4: podem tomar qualquer valor positivo ou negativo,
 !                  mas valor1 < valor2.
-! media, desvio - media e desvio padrão da distribuicao
+! media, desvio - media e desvio padrï¿½o da distribuicao
 !                  real*4: podem tomar qualquer valor mas desvio >0.
 ! opcao - opcoes a enviar para a funcao
 !                  integer*1: nao e' usada para ja.

@@ -93,7 +93,7 @@ END MODULE global
 ! tamarray - tamanho do array com os pontos existentes
 ! fronteira - array auxiliar para o calculo das condicoes fronteira
 
-! cadeia(Ncad, 0:1) - array com a listagem das cadeias e do 1º monomero
+! cadeia(Ncad, 0:1) - array com a listagem das cadeias e do 1ï¿½ monomero
 !                          na posicao 0 indica o dominio a que pertence a cadeia
 ! ncadeia(Ncad) - numero de monomeros em cada cadeia
 ! ncadeiafim(Ncad) - numero de monomeros final previsto para cada cadeia
@@ -214,10 +214,12 @@ END MODULE global
     INTEGER(KIND=4) :: vezes, tenta_encaix, contavezes
     CHARACTER(LEN=10),ALLOCATABLE, DIMENSION(:) :: director
 
+    INTEGER(KIND=4) :: tam_max_cad
+
     INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:,:) :: con_tam_cad
     INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:,:) :: con_ang_cad
     INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:,:) :: con_pos_cad
-    INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:) :: con_pos_mon   
+    INTEGER(KIND=4),ALLOCATABLE,DIMENSION(:,:) :: con_pos_mon
 
 
   CONTAINS
@@ -284,6 +286,7 @@ END MODULE global
 
     vezes = 1
     contavezes = 1
+    tam_max_cad = 20
 
   END SUBROUTINE
 
@@ -291,8 +294,7 @@ END MODULE global
 END MODULE
 MODULE gaussiana
 
-!  USE DFPORT    !Sera necessario comentar esta linha quando nao se estiver a usar 
-                ! o fortran da DIGITAL/COMPAQ/HP
+
 !  IMPLICIT NONE
 
   CONTAINS
@@ -331,7 +333,7 @@ MODULE gaussiana
 ! valor1, valor2 - valor maximo e minimo da distribuicao
 !                  integer*4: podem tomar qualquer valor positivo ou negativo,
 !                  mas valor1 < valor2.
-! media, desvio - media e desvio padrão da distribuicao
+! media, desvio - media e desvio padrï¿½o da distribuicao
 !                  real*4: podem tomar qualquer valor mas desvio >0.
 ! opcao - opcoes a enviar para a funcao
 !                  integer*1: nao e' usada para ja.
@@ -555,8 +557,7 @@ END MODULE
 
 MODULE crescer
 
-!  USE DFPORT    !Sera necessario comentar esta linha quando nao se estiver a usar 
-                ! o fortran da DIGITAL/COMPAQ/HP
+
 
   USE comum
   ! precisa das variaveis comuns:
@@ -628,7 +629,7 @@ MODULE crescer
     INTEGER(KIND=1) :: tam    !taman que tem a cadeia neste momento
     INTEGER(KIND=1) :: tami    !taman que tem a cadeia na direccao i
     INTEGER(KIND=1) :: tamj    !tamanho que tem a cadeia na direccao j
-    INTEGER(KIND=1) :: lado    !determina para que lado vai começar a crescer (+1/-1)
+    INTEGER(KIND=1) :: lado    !determina para que lado vai comeï¿½ar a crescer (+1/-1)
 !    REAL(KIND=4) :: al, ga
 
 ! validacao das variaveis de input
@@ -706,8 +707,7 @@ MODULE input
 
   USE comum
 
-!  USE DFPORT    ! E' necessario comentar esta linha quando nao se usa o fortran
-                ! da DIGITAL/COMPAQ/HP
+
 
   CONTAINS
 
@@ -761,6 +761,7 @@ MODULE input
     INTEGER(KIND=4) :: i, j, k, temp
     INTEGER(KIND=4) :: semente
     REAL(KIND=4) :: a
+    LOGICAL :: existe
 
     CHARACTER(25) :: WDKEY
     CHARACTER(25) :: WKEY
@@ -769,6 +770,12 @@ MODULE input
 
     numeromon = 300000
     numerocad = 50000
+
+    INQUIRE(FILE="sparg.ini", EXIST=existe)
+    IF (.NOT. existe) THEN
+      WRITE(*,*) 'Erro: ficheiro de input "sparg.ini" nao encontrado.'
+      STOP
+    ENDIF
 
     OPEN (UNIT=1, FILE="sparg.ini", STATUS="old")
     OPEN (UNIT=2, FILE="sparg.txt")
@@ -906,7 +913,7 @@ MODULE input
     ALLOCATE (cadeia(1:numerocad,0:20), ncadeia(1:numerocad), ncadeiafim(1:numerocad), STAT=error)
 
     IF (error /= 0) THEN
-      WRITE(*,*) 'Erro ao alocar espaço para os arrays cadeia, ncadeia e ncadeiafim.'
+      WRITE(*,*) 'Erro ao alocar espaï¿½o para os arrays cadeia, ncadeia e ncadeiafim.'
       WRITE(*,*) 'numerocad = ',numerocad
       STOP
     ENDIF
@@ -928,7 +935,7 @@ MODULE input
               array(1:numeromon*10,1:3), STAT=error)
 
     IF (error /= 0) THEN
-      WRITE(*,*) 'Erro ao alocar espaço para os arrays pos, alfa, beta, gama, array.'
+      WRITE(*,*) 'Erro ao alocar espaï¿½o para os arrays pos, alfa, beta, gama, array.'
       WRITE(*,*) 'numeromon = ',numeromon
       STOP
     ENDIF
@@ -961,7 +968,7 @@ MODULE input
     WRITE(UNIT=2,FMT=*)
 
 ! utilizacao do seed
-    a = RAND(semente)
+    CALL srand(semente)
 
 
 ! array auxiliar para estabelecer as condicoes fronteira
@@ -978,9 +985,11 @@ MODULE input
     fronteira(7,2) = 0.
     fronteira(8,2) = -dimy
 
-!alocar espaço para as variaveis estatisticas
+!alocar espaï¿½o para as variaveis estatisticas
 
-    ALLOCATE (con_tam_cad(0:20,1:ndom,1:vezes))
+    tam_max_cad = INT(MAXVAL(medias(1:ndom)) + 4.*MAXVAL(desvios(1:ndom))) + 1
+
+    ALLOCATE (con_tam_cad(0:tam_max_cad,1:ndom,1:vezes))
     ALLOCATE (con_ang_cad(0:18,1:ndom,1:vezes))
     ALLOCATE (con_pos_cad(0:dimz_inteiro,1:ndom,1:vezes))
     ALLOCATE (con_pos_mon(0:dimz_inteiro,1:vezes))
@@ -993,14 +1002,14 @@ MODULE input
 ! array de directorias
     ALLOCATE (director(1:vezes))
 
-    IF (vezes <= 1) THEN
+    IF (vezes == 1) THEN
       director(1) = './'
-    ELSEIF (vezes <= 10 .AND. vezes > 1) THEN
+    ELSE
       DO i=1, vezes
-        director(i) = './' // ACHAR(i+47) // '/'
+        WRITE(director(i), '(A,I0,A)') './', i, '/'
+        CALL EXECUTE_COMMAND_LINE('mkdir -p ' // TRIM(director(i)))
       ENDDO
     ENDIF
-    director = ADJUSTR(director)
 
     RETURN
   END SUBROUTINE
@@ -1046,11 +1055,11 @@ MODULE prints
 
 ! variaveis mudas
     INTEGER(KIND=4) :: i, j
-    INTEGER(KIND=4),DIMENSION(1:20) :: a
-    CHARACTER(LEN=25) :: direcadeias, diremonomeros
+    INTEGER(KIND=4),DIMENSION(1:tam_max_cad) :: a
+    CHARACTER(LEN=40) :: direcadeias, diremonomeros
 
-    direcadeias = director(contavezes)//'cadeias.txt'
-    diremonomeros = director(contavezes)//'monomeros.txt'
+    direcadeias = TRIM(director(contavezes))//'cadeias.txt'
+    diremonomeros = TRIM(director(contavezes))//'monomeros.txt'
 
 !!! Escrita do ficheiro das cadeias
     OPEN (UNIT=4, FILE=direcadeias)
@@ -1062,7 +1071,7 @@ MODULE prints
       DO j=2,ncadeia(i)
         a(j) = a(j-1) + 1
       ENDDO
-      WRITE(UNIT=4,FMT='(20I7)') a(:)
+      WRITE(UNIT=4,FMT=*) a(:)
     ENDDO
 
     DO i=1,Ncad
@@ -1120,7 +1129,7 @@ MODULE prints
     WRITE(UNIT=2,FMT=*)'amostra, dominio, tamanho cadeia, numero de cadeias'
     DO k=1, vezes
       DO i=1,ndom
-        DO j=2,20
+        DO j=2,tam_max_cad
           WRITE(UNIT=2,FMT='(4i8)') k,i,j,con_tam_cad(j,i,k)
         ENDDO
       ENDDO
@@ -1172,8 +1181,7 @@ END MODULE
 
 MODULE rotinas
 
-!  USE DFPORT    !Sera necessario comentar esta linha quando nao se estiver a usar 
-                ! o fortran da DIGITAL/COMPAQ/HP
+
   USE comum
 
 !  IMPLICIT NONE
@@ -1391,10 +1399,11 @@ END MODULE
     USE rotinas
 
     INTEGER(KIND=4) :: i, j, k, aviso
+    INTEGER(KIND=4) :: tmp
     LOGICAL :: sucesso
     INTEGER(KIND=4), POINTER :: ordenacao(:)
     INTEGER(KIND=4), POINTER :: dom_ord(:)
-    INTEGER(KIND=4), ALLOCATABLE :: ncaddom(:)    !numero de cadeias em 
+    INTEGER(KIND=4), ALLOCATABLE :: ncaddom(:)    !numero de cadeias em
                                                   !cada dominio
 
     sucesso = .TRUE.
@@ -1409,126 +1418,152 @@ END MODULE
 !**                  LOOP PRINCIPAL DO PROGRAMA                        **
 !************************************************************************
 
+    DO
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Opcao A: comeca a preeencher pelas cadeias maiores
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !          implica definir primeiro as cadeias com os seus tamanhos
-100 IF (opcdom1==0) THEN
-      j = SUM(Ncade(:))
+      IF (opcdom1==0) THEN
+        j = SUM(Ncade(:))
 
-      ALLOCATE(dom_ord(1:j))
+        ALLOCATE(dom_ord(1:j))
 
-      Ncad = 0    !inicializacao do numero total de cadeias
-      ncaddom = 0    !inicializacao do numero de cadeias em cada dominio
- 20   i = INT(RAND(0)*ndom + 1.)    !tira a sorte um dominio
-      IF (ncaddom(i) < Ncade(i)) THEN
-        ncaddom(i) = ncaddom(i) + 1
-        Ncad = Ncad + 1   !estabelece um tamanho previo para cada cadeia
-        ncadeiafim(Ncad)=gauss(2,20,medias(i),desvios(i),0,0)
-        dom_ord(Ncad) = i
-      ENDIF
-      IF (Ncad < j) THEN
-        GOTO 20
-      ENDIF
+        Ncad = 0    !inicializacao do numero total de cadeias
+        ncaddom = 0    !inicializacao do numero de cadeias em cada dominio
 
-      ALLOCATE (ordenacao(1:Ncad))
-
-! ordenar cadeias por tamanho
-
-      ordenacao(1:Ncad) = (/(k,k=1,Ncad)/)
-
-      DO j=1, Ncad
-        DO k=1, Ncad
-          IF (ncadeiafim(ordenacao(k)) < ncadeiafim(ordenacao(j))) THEN
-            kk = ordenacao(k)
-            ordenacao(k) = ordenacao(j)
-            ordenacao(j) = kk
+        DO WHILE (Ncad < j)
+          i = INT(RAND(0)*ndom + 1.)    !tira a sorte um dominio
+          IF (ncaddom(i) < Ncade(i)) THEN
+            ncaddom(i) = ncaddom(i) + 1
+            Ncad = Ncad + 1   !estabelece um tamanho previo para cada cadeia
+            ncadeiafim(Ncad)=gauss(2,tam_max_cad,medias(i),desvios(i),0,0)
+            dom_ord(Ncad) = i
           ENDIF
         ENDDO
-      ENDDO
+
+        ALLOCATE (ordenacao(1:Ncad))
+
+! ordenar cadeias por tamanho (insertion sort, maior primeiro)
+
+        ordenacao(1:Ncad) = (/(k,k=1,Ncad)/)
+
+        DO j=2, Ncad
+          tmp = ordenacao(j)
+          k = j - 1
+          DO WHILE (k >= 1 .AND. ncadeiafim(ordenacao(k)) < ncadeiafim(tmp))
+            ordenacao(k+1) = ordenacao(k)
+            k = k - 1
+          ENDDO
+          ordenacao(k+1) = tmp
+        ENDDO
 
 ! tentar crescer cada cadeia
-      DO j=1, Ncad
-        i = dom_ord(ordenacao(j))    !indica a que dominio pertence a cadeia
+        DO j=1, Ncad
+          i = dom_ord(ordenacao(j))    !indica a que dominio pertence a cadeia
 
-        tamanho = ncadeiafim(ordenacao(j))    !ve qual o tamanho da cadeia
+          tamanho = ncadeiafim(ordenacao(j))    !ve qual o tamanho da cadeia
 
-      !tira 'a sorte a posicao inicial e a direccao (no dominio i)
- 10     CALL tentaponto(i)
+          DO    !loop de tentativas de posicao
+            CALL tentaponto(i)
 
-      !tenta crescer nessa posicao e com esse tamanho
-        pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
-                                          tentabeta,tentagama,tamanho,sucesso)
+            pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
+                                              tentabeta,tentagama,tamanho,sucesso)
 
-        IF (pos(Nmon+1,1) /= -100) THEN
-          CALL suces(i,ordenacao(j))
-        ELSE
-          CALL insuces(i,aviso)
-          IF (aviso == 1000) THEN
-            contagem(i) = INT(contagem(i)*0.9999)
-            CYCLE
-          !  EXIT
-          ELSE
-            GOTO 10
-          ENDIF
-        ENDIF
+            IF (pos(Nmon+1,1) /= -100) THEN
+              CALL suces(i,ordenacao(j))
+              EXIT
+            ELSE
+              CALL insuces(i,aviso)
+              IF (aviso == 1000) THEN
+                contagem(i) = INT(contagem(i)*0.9999)
+                EXIT
+              ENDIF
+            ENDIF
+          ENDDO
 
-      ENDDO
-
-
+        ENDDO
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Opcao B: comeca a preencher por uma cadeia qualquer
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ELSEIF (opcdom1==1) THEN
+      ELSEIF (opcdom1==1) THEN
 
 ! -A: constroi os dominios todos ao mesmo tempo
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      IF (opcdom2==0) THEN
-        DO
-          i = INT(RAND(0)*ndom + 1)    !tira 'a sorte para qual dominio vai esta cadeia
+        IF (opcdom2==0) THEN
+          DO
+            i = INT(RAND(0)*ndom + 1)    !tira 'a sorte para qual dominio vai esta cadeia
 
-          IF (preenchido(i) >= previsto(i)) THEN    !verifica se o dominio ja esta preenchido
-            IF (npreenchido == ndom) THEN    !se todos os dominios estiverem preenchidos,
-              EXIT                           !sai do loop
+            IF (preenchido(i) >= previsto(i)) THEN    !verifica se o dominio ja esta preenchido
+              IF (npreenchido == ndom) THEN    !se todos os dominios estiverem preenchidos,
+                EXIT                           !sai do loop
+              ENDIF
+              CYCLE
             ENDIF
-            CYCLE
-          ENDIF
 
-      ! tira 'a sorte a posicao inicial e a direccao (no dominio i)
-          CALL tentaponto(i)
-      !tira 'a sorte um tamanho
-         tamanho = gauss(2, 20, medias(i), desvios(i), 0, 0)
+        ! tira 'a sorte a posicao inicial e a direccao (no dominio i)
+            CALL tentaponto(i)
+        !tira 'a sorte um tamanho
+           tamanho = gauss(2, tam_max_cad, medias(i), desvios(i), 0, 0)
 
-      !tenta crescer nessa posicao e com esse tamanho
-          pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
-                                          tentabeta,tentagama,tamanho,sucesso)
+        !tenta crescer nessa posicao e com esse tamanho
+            pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
+                                            tentabeta,tentagama,tamanho,sucesso)
 
-          IF (pos(Nmon+1,1) /= -100) THEN
-            CALL suces(i,0)
-          ELSE
-            CALL insuces(i,aviso)
-            IF (aviso == 1000) THEN
-              EXIT
+            IF (pos(Nmon+1,1) /= -100) THEN
+              CALL suces(i,0)
+            ELSE
+              CALL insuces(i,aviso)
+              IF (aviso == 1000) THEN
+                EXIT
+              ENDIF
             ENDIF
-          ENDIF
-        ENDDO
+          ENDDO
 
 
-! -B constroi primeiro os dois primeiros da ordem de input 
-!    (poderao ser os ligados,por exemplo) e depois constroi 
+! -B constroi primeiro os dois primeiros da ordem de input
+!    (poderao ser os ligados,por exemplo) e depois constroi
 !     os outros todos ao mesmo tempo
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ELSEIF (opcdom2==1) THEN
+        ELSEIF (opcdom2==1) THEN
 
- front1:DO i=1,2
-          DO WHILE (preenchido(i) < previsto(i))
+ front1:  DO i=1,2
+            DO WHILE (preenchido(i) < previsto(i))
+          ! tira 'a sorte a posicao inicial e a direccao
+              CALL tentaponto(i)
+
+          !tira 'a sorte um tamanho
+              tamanho = gauss(2, tam_max_cad, medias(i), desvios(i), 0, 0)
+
+          !tenta crescer nessa posicao e com esse tamanho
+              pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
+                                              tentabeta,tentagama,tamanho,sucesso)
+              IF (pos(Nmon+1,1) /= -100) THEN
+                CALL suces(i,0)
+              ELSE
+                CALL insuces(i,aviso)
+                IF (aviso == 1000) THEN
+                  EXIT front1
+                ENDIF
+              ENDIF
+            ENDDO
+          ENDDO front1
+
+          DO
+            i = INT(RAND(0)*(ndom - 1)) + 2    !tira 'a sorte para qual dominio vai esta cadeia
+            IF (preenchido(i) >= previsto(i)) THEN    !verifica se o dominio ja esta preenchido
+              IF (npreenchido == ndom) THEN    ! se todos os dominios estiverem preenchidos,
+                EXIT                           ! sai do loop
+              ENDIF
+              CYCLE
+            ENDIF
         ! tira 'a sorte a posicao inicial e a direccao
             CALL tentaponto(i)
 
         !tira 'a sorte um tamanho
-            tamanho = gauss(2, 20, medias(i), desvios(i), 0, 0)
+            tamanho = gauss(2, tam_max_cad, medias(i), desvios(i), 0, 0)
 
         !tenta crescer nessa posicao e com esse tamanho
             pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
@@ -1538,87 +1573,62 @@ END MODULE
             ELSE
               CALL insuces(i,aviso)
               IF (aviso == 1000) THEN
-                EXIT front1
+                EXIT
               ENDIF
             ENDIF
           ENDDO
-        ENDDO front1
-
-        DO
-          i = INT(RAND(0)*(ndom - 1)) + 2    !tira 'a sorte para qual dominio vai esta cadeia
-          IF (preenchido(i) >= previsto(i)) THEN    !verifica se o dominio ja esta preenchido
-            IF (npreenchido == ndom) THEN    ! se todos os dominios estiverem preenchidos, 
-              EXIT                           ! sai do loop
-            ENDIF
-            CYCLE
-          ENDIF
-      ! tira 'a sorte a posicao inicial e a direccao
-          CALL tentaponto(i)
-
-      !tira 'a sorte um tamanho
-          tamanho = gauss(2, 20, medias(i), desvios(i), 0, 0)
-
-      !tenta crescer nessa posicao e com esse tamanho
-          pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
-                                          tentabeta,tentagama,tamanho,sucesso)
-          IF (pos(Nmon+1,1) /= -100) THEN
-            CALL suces(i,0)
-          ELSE
-            CALL insuces(i,aviso)
-            IF (aviso == 1000) THEN
-              EXIT
-            ENDIF
-          ENDIF
-        ENDDO
 
 ! -C constroi os dominios pela ordem de input do ficheiro de dados
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      ELSEIF (opcdom2==2) THEN
+        ELSEIF (opcdom2==2) THEN
 
- front2:DO i=1,ndom
-          DO WHILE (preenchido(i) < previsto(i))
-        ! tira 'a sorte a posicao inicial e a direccao
-            CALL tentaponto(i)
+ front2:  DO i=1,ndom
+            DO WHILE (preenchido(i) < previsto(i))
+          ! tira 'a sorte a posicao inicial e a direccao
+              CALL tentaponto(i)
 
-        !tira 'a sorte um tamanho
-            tamanho = gauss(2, 20, medias(i), desvios(i), 0, 0)
+          !tira 'a sorte um tamanho
+              tamanho = gauss(2, tam_max_cad, medias(i), desvios(i), 0, 0)
 
-        !tenta crescer nessa posicao e com esse tamanho
-            pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
-                                            tentabeta,tentagama,tamanho,sucesso)
-            IF (pos(Nmon+1,1) /= -100) THEN
-              CALL suces(i,0)
-            ELSE
-              CALL insuces(i,aviso)
-              IF (aviso == 1000) THEN
-                EXIT front2
+          !tenta crescer nessa posicao e com esse tamanho
+              pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
+                                              tentabeta,tentagama,tamanho,sucesso)
+              IF (pos(Nmon+1,1) /= -100) THEN
+                CALL suces(i,0)
+              ELSE
+                CALL insuces(i,aviso)
+                IF (aviso == 1000) THEN
+                  EXIT front2
+                ENDIF
               ENDIF
-            ENDIF
-          ENDDO
-        ENDDO front2
+            ENDDO
+          ENDDO front2
 
+        ENDIF
       ENDIF
-    ENDIF
 
 ! estabelece as condicoes fronteiras (reduz tudo a um volume)
-    CALL condfronteira
+      CALL condfronteira
 
 ! faz as estatisticas
-    CALL estatisticas
+      CALL estatisticas
 
 ! grava os resultados
-    CALL printt
+      CALL printt
 
 ! para varias corridas
-    contavezes = contavezes + 1
+      contavezes = contavezes + 1
 
-    IF (contavezes <= vezes) THEN
+      IF (contavezes > vezes) EXIT
+
       CALL reiniciar
       aviso = 0
-      DEALLOCATE(dom_ord)
-      DEALLOCATE (ordenacao)
-      GOTO 100
-    ENDIF
+      IF (opcdom1 == 0) THEN
+        DEALLOCATE(dom_ord)
+        DEALLOCATE(ordenacao)
+      ENDIF
+
+    ENDDO
 
 ! grava os resultados finais
     CALL printf
@@ -1628,4 +1638,3 @@ END MODULE
 
     STOP
     END
-

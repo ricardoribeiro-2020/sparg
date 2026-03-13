@@ -1,8 +1,7 @@
 
 MODULE crescer
 
-  USE DFPORT    !Sera necessario comentar esta linha quando nao se estiver a usar 
-                ! o fortran da DIGITAL/COMPAQ/HP
+
 
   USE comum
   ! precisa das variaveis comuns:
@@ -74,7 +73,7 @@ MODULE crescer
     INTEGER(KIND=1) :: tam    !taman que tem a cadeia neste momento
     INTEGER(KIND=1) :: tami    !taman que tem a cadeia na direccao i
     INTEGER(KIND=1) :: tamj    !tamanho que tem a cadeia na direccao j
-    INTEGER(KIND=1) :: lado    !determina para que lado vai começar a crescer (+1/-1)
+    INTEGER(KIND=1) :: lado    !determina para que lado vai comeï¿½ar a crescer (+1/-1)
 !    REAL(KIND=4) :: al, ga
 
 ! validacao das variaveis de input
