@@ -1632,9 +1632,9 @@ END MODULE
 
 ! grava os resultados finais
     CALL printf
-    PRINT(UNIT=2,FMT=*)
-    PRINT(UNIT=2,FMT=*)' Programa terminou'
-    PRINT(UNIT=2,FMT=*)
+    WRITE(UNIT=2,FMT=*)
+    WRITE(UNIT=2,FMT=*)' Programa terminou'
+    WRITE(UNIT=2,FMT=*)
     CLOSE(UNIT=2)
 
     STOP
