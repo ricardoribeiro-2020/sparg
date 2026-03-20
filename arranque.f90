@@ -1064,7 +1064,7 @@ MODULE prints
 !!! Escrita do ficheiro das cadeias
     OPEN (UNIT=4, FILE=direcadeias)
 
-    WRITE(UNIT=4,FMT=*) Ncad
+    WRITE(UNIT=4,FMT=*) Ncad, tam_max_cad
     DO i=1,Ncad
       a = 0
       a(1)=cadeia(i,1)

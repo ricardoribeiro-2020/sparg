@@ -26,7 +26,7 @@ MODULE prints
 !   %               Explicacao detalhada do programa             %
 !   % Esta subrotina contem as instrucoes de gravacao dos re-    %
 !   % sultados obtidos em ficheiros externos onde posteriormente %
-!   % podem ser utilizados por outrous programas                 %
+!   % podem ser utilizados por outros programas                  %
 !   %                                                            %
 !   %                                                            %
 !   % Funciona com variaveis comuns, que sao as que imprime      %
@@ -47,7 +47,7 @@ MODULE prints
 !!! Escrita do ficheiro das cadeias
     OPEN (UNIT=4, FILE=direcadeias)
 
-    WRITE(UNIT=4,FMT=*) Ncad
+    WRITE(UNIT=4,FMT=*) Ncad, tam_max_cad
     DO i=1,Ncad
       a = 0
       a(1)=cadeia(i,1)
