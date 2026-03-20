@@ -74,7 +74,7 @@ MODULE crescer
     INTEGER(KIND=1) :: tami    !taman que tem a cadeia na direccao i
     INTEGER(KIND=1) :: tamj    !tamanho que tem a cadeia na direccao j
     INTEGER(KIND=1) :: lado    !determina para que lado vai come�ar a crescer (+1/-1)
-!    REAL(KIND=4) :: al, ga
+    REAL(KIND=4) :: al, ga
 
 ! validacao das variaveis de input
     IF (taman < 0 .OR. taman > 100) THEN
@@ -105,17 +105,17 @@ MODULE crescer
     tamj = 0
     lado = 2*INT(RAND(0) + 0.5) - 1
     IF(lado == -1) THEN
-      alf = alf + pi
-      gam = gam + pi
+      al = alf + pi
+      ga = gam + pi
     ELSE
-      alf = alf
-      gam = gam
+      al = alf
+      ga = gam
     ENDIF
 
     DO i=1,taman    !tenta crescer para um lado; cada ponto a mais e' um monomero a mais
-      ponto(i,1) = ponto(i-1,1) + comprimento*SIN(alf)*COS(gam)
-      ponto(i,2) = ponto(i-1,2) + comprimento*SIN(alf)*SIN(gam)
-      ponto(i,3) = ponto(i-1,3) + comprimento*COS(alf)
+      ponto(i,1) = ponto(i-1,1) + comprimento*SIN(al)*COS(ga)
+      ponto(i,2) = ponto(i-1,2) + comprimento*SIN(al)*SIN(ga)
+      ponto(i,3) = ponto(i-1,3) + comprimento*COS(al)
       IF (ponto(i,3) >= dimz .OR. ponto(i,3) <= 0 .OR. &
           .NOT.encaixa(ponto(i,:),raio,array,tamarray)) THEN
         EXIT
@@ -125,9 +125,9 @@ MODULE crescer
     ENDDO
 
     DO j=1,taman-tam
-      ponto(-j,1) = ponto(-j+1,1) - comprimento*SIN(alf)*COS(gam)
-      ponto(-j,2) = ponto(-j+1,2) - comprimento*SIN(alf)*SIN(gam)
-      ponto(-j,3) = ponto(-j+1,3) - comprimento*COS(alf)
+      ponto(-j,1) = ponto(-j+1,1) - comprimento*SIN(al)*COS(ga)
+      ponto(-j,2) = ponto(-j+1,2) - comprimento*SIN(al)*SIN(ga)
+      ponto(-j,3) = ponto(-j+1,3) - comprimento*COS(al)
       IF (ponto(-j,3) >= dimz .OR. ponto(-j,3) <= 0 .OR. &
           .NOT.encaixa(ponto(-j,:),raio,array,tamarray)) THEN
         sucesso = .FALSE.

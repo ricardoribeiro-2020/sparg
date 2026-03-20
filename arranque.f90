@@ -630,7 +630,7 @@ MODULE crescer
     INTEGER(KIND=1) :: tami    !taman que tem a cadeia na direccao i
     INTEGER(KIND=1) :: tamj    !tamanho que tem a cadeia na direccao j
     INTEGER(KIND=1) :: lado    !determina para que lado vai come�ar a crescer (+1/-1)
-!    REAL(KIND=4) :: al, ga
+    REAL(KIND=4) :: al, ga
 
 ! validacao das variaveis de input
     IF (taman < 0 .OR. taman > 100) THEN
@@ -661,17 +661,17 @@ MODULE crescer
     tamj = 0
     lado = 2*INT(RAND(0) + 0.5) - 1
     IF(lado == -1) THEN
-      alf = alf + pi
-      gam = gam + pi
+      al = alf + pi
+      ga = gam + pi
     ELSE
-      alf = alf
-      gam = gam
+      al = alf
+      ga = gam
     ENDIF
 
     DO i=1,taman    !tenta crescer para um lado; cada ponto a mais e' um monomero a mais
-      ponto(i,1) = ponto(i-1,1) + comprimento*SIN(alf)*COS(gam)
-      ponto(i,2) = ponto(i-1,2) + comprimento*SIN(alf)*SIN(gam)
-      ponto(i,3) = ponto(i-1,3) + comprimento*COS(alf)
+      ponto(i,1) = ponto(i-1,1) + comprimento*SIN(al)*COS(ga)
+      ponto(i,2) = ponto(i-1,2) + comprimento*SIN(al)*SIN(ga)
+      ponto(i,3) = ponto(i-1,3) + comprimento*COS(al)
       IF (ponto(i,3) >= dimz .OR. ponto(i,3) <= 0 .OR. &
           .NOT.encaixa(ponto(i,:),raio,array,tamarray)) THEN
         EXIT
@@ -681,9 +681,9 @@ MODULE crescer
     ENDDO
 
     DO j=1,taman-tam
-      ponto(-j,1) = ponto(-j+1,1) - comprimento*SIN(alf)*COS(gam)
-      ponto(-j,2) = ponto(-j+1,2) - comprimento*SIN(alf)*SIN(gam)
-      ponto(-j,3) = ponto(-j+1,3) - comprimento*COS(alf)
+      ponto(-j,1) = ponto(-j+1,1) - comprimento*SIN(al)*COS(ga)
+      ponto(-j,2) = ponto(-j+1,2) - comprimento*SIN(al)*SIN(ga)
+      ponto(-j,3) = ponto(-j+1,3) - comprimento*COS(al)
       IF (ponto(-j,3) >= dimz .OR. ponto(-j,3) <= 0 .OR. &
           .NOT.encaixa(ponto(-j,:),raio,array,tamarray)) THEN
         sucesso = .FALSE.
@@ -913,7 +913,7 @@ MODULE input
     ALLOCATE (cadeia(1:numerocad,0:20), ncadeia(1:numerocad), ncadeiafim(1:numerocad), STAT=error)
 
     IF (error /= 0) THEN
-      WRITE(*,*) 'Erro ao alocar espa�o para os arrays cadeia, ncadeia e ncadeiafim.'
+      WRITE(*,*) 'Erro ao alocar espaço para os arrays cadeia, ncadeia e ncadeiafim.'
       WRITE(*,*) 'numerocad = ',numerocad
       STOP
     ENDIF
@@ -932,10 +932,10 @@ MODULE input
     numeromon = INT(SUM(previsto)*1.1)
 
     ALLOCATE (pos(1:numeromon,1:3),alfa(1:numeromon),beta(1:numeromon),gama(1:numeromon), &
-              array(1:numeromon*10,1:3), STAT=error)
+              array(1:9*numeromon+9*numerocad,1:3), STAT=error)
 
     IF (error /= 0) THEN
-      WRITE(*,*) 'Erro ao alocar espa�o para os arrays pos, alfa, beta, gama, array.'
+      WRITE(*,*) 'Erro ao alocar espaço para os arrays pos, alfa, beta, gama, array.'
       WRITE(*,*) 'numeromon = ',numeromon
       STOP
     ENDIF
@@ -985,7 +985,7 @@ MODULE input
     fronteira(7,2) = 0.
     fronteira(8,2) = -dimy
 
-!alocar espa�o para as variaveis estatisticas
+!alocar espaço para as variaveis estatisticas
 
     tam_max_cad = INT(MAXVAL(medias(1:ndom)) + 4.*MAXVAL(desvios(1:ndom))) + 1
 
@@ -1043,7 +1043,7 @@ MODULE prints
 !   %               Explicacao detalhada do programa             %
 !   % Esta subrotina contem as instrucoes de gravacao dos re-    %
 !   % sultados obtidos em ficheiros externos onde posteriormente %
-!   % podem ser utilizados por outrous programas                 %
+!   % podem ser utilizados por outros programas                  %
 !   %                                                            %
 !   %                                                            %
 !   % Funciona com variaveis comuns, que sao as que imprime      %
@@ -1513,7 +1513,7 @@ END MODULE
                                             tentabeta,tentagama,tamanho,sucesso)
 
             IF (pos(Nmon+1,1) /= -100) THEN
-              CALL suces(i,0)
+              tmp = 0; CALL suces(i,tmp)
             ELSE
               CALL insuces(i,aviso)
               IF (aviso == 1000) THEN
@@ -1541,7 +1541,7 @@ END MODULE
               pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
                                               tentabeta,tentagama,tamanho,sucesso)
               IF (pos(Nmon+1,1) /= -100) THEN
-                CALL suces(i,0)
+                tmp = 0; CALL suces(i,tmp)
               ELSE
                 CALL insuces(i,aviso)
                 IF (aviso == 1000) THEN
@@ -1569,7 +1569,7 @@ END MODULE
             pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
                                             tentabeta,tentagama,tamanho,sucesso)
             IF (pos(Nmon+1,1) /= -100) THEN
-              CALL suces(i,0)
+              tmp = 0; CALL suces(i,tmp)
             ELSE
               CALL insuces(i,aviso)
               IF (aviso == 1000) THEN
@@ -1594,7 +1594,7 @@ END MODULE
               pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
                                               tentabeta,tentagama,tamanho,sucesso)
               IF (pos(Nmon+1,1) /= -100) THEN
-                CALL suces(i,0)
+                tmp = 0; CALL suces(i,tmp)
               ELSE
                 CALL insuces(i,aviso)
                 IF (aviso == 1000) THEN
@@ -1632,9 +1632,10 @@ END MODULE
 
 ! grava os resultados finais
     CALL printf
-
+    PRINT(UNIT=2,FMT=*)
+    PRINT(UNIT=2,FMT=*)' Programa terminou'
+    PRINT(UNIT=2,FMT=*)
     CLOSE(UNIT=2)
-
 
     STOP
     END

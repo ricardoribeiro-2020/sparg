@@ -151,7 +151,7 @@
                                             tentabeta,tentagama,tamanho,sucesso)
 
             IF (pos(Nmon+1,1) /= -100) THEN
-              CALL suces(i,0)
+              tmp = 0; CALL suces(i,tmp)
             ELSE
               CALL insuces(i,aviso)
               IF (aviso == 1000) THEN
@@ -179,7 +179,7 @@
               pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
                                               tentabeta,tentagama,tamanho,sucesso)
               IF (pos(Nmon+1,1) /= -100) THEN
-                CALL suces(i,0)
+                tmp = 0; CALL suces(i,tmp)
               ELSE
                 CALL insuces(i,aviso)
                 IF (aviso == 1000) THEN
@@ -207,7 +207,7 @@
             pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
                                             tentabeta,tentagama,tamanho,sucesso)
             IF (pos(Nmon+1,1) /= -100) THEN
-              CALL suces(i,0)
+              tmp = 0; CALL suces(i,tmp)
             ELSE
               CALL insuces(i,aviso)
               IF (aviso == 1000) THEN
@@ -232,7 +232,7 @@
               pos(Nmon+1:Nmon+tamanho,:) = cresce(tentax,tentay,tentaz,tentaalfa, &
                                               tentabeta,tentagama,tamanho,sucesso)
               IF (pos(Nmon+1,1) /= -100) THEN
-                CALL suces(i,0)
+                tmp = 0; CALL suces(i,tmp)
               ELSE
                 CALL insuces(i,aviso)
                 IF (aviso == 1000) THEN
@@ -270,9 +270,10 @@
 
 ! grava os resultados finais
     CALL printf
-
+    PRINT(UNIT=2,FMT=*)
+    PRINT(UNIT=2,FMT=*)' Programa terminou'
+    PRINT(UNIT=2,FMT=*)
     CLOSE(UNIT=2)
-
 
     STOP
     END

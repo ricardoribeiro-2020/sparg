@@ -208,7 +208,7 @@ MODULE input
     ALLOCATE (cadeia(1:numerocad,0:20), ncadeia(1:numerocad), ncadeiafim(1:numerocad), STAT=error)
 
     IF (error /= 0) THEN
-      WRITE(*,*) 'Erro ao alocar espa�o para os arrays cadeia, ncadeia e ncadeiafim.'
+      WRITE(*,*) 'Erro ao alocar espaço para os arrays cadeia, ncadeia e ncadeiafim.'
       WRITE(*,*) 'numerocad = ',numerocad
       STOP
     ENDIF
@@ -227,10 +227,10 @@ MODULE input
     numeromon = INT(SUM(previsto)*1.1)
 
     ALLOCATE (pos(1:numeromon,1:3),alfa(1:numeromon),beta(1:numeromon),gama(1:numeromon), &
-              array(1:numeromon*10,1:3), STAT=error)
+              array(1:9*numeromon+9*numerocad,1:3), STAT=error)
 
     IF (error /= 0) THEN
-      WRITE(*,*) 'Erro ao alocar espa�o para os arrays pos, alfa, beta, gama, array.'
+      WRITE(*,*) 'Erro ao alocar espaço para os arrays pos, alfa, beta, gama, array.'
       WRITE(*,*) 'numeromon = ',numeromon
       STOP
     ENDIF
@@ -280,7 +280,7 @@ MODULE input
     fronteira(7,2) = 0.
     fronteira(8,2) = -dimy
 
-!alocar espa�o para as variaveis estatisticas
+!alocar espaço para as variaveis estatisticas
 
     tam_max_cad = INT(MAXVAL(medias(1:ndom)) + 4.*MAXVAL(desvios(1:ndom))) + 1
 
